@@ -32,4 +32,5 @@ public class ServiceException extends AbstractException {
                 ", errorCode='" + errorCode + '\'' +
                 '}';
     }
+
 }
