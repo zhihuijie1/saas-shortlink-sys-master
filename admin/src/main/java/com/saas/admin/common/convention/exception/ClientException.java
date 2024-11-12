@@ -30,4 +30,5 @@ public class ClientException extends AbstractException {
                 ", errorMessage='" + errorMessage + '\'' +
                 '}';
     }
+
 }
