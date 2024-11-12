@@ -30,8 +30,17 @@
         <redisson.version>3.21.3</redisson.version>
         <guava.version>30.0-jre</guava.version>
     </properties>
+    <!--dependencies 统一依赖管理，子模块不用自己再加了-->
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
 
-    <!--依赖管理-->
+    <!--依赖管理 后面的子模块还需要自己加-->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -122,13 +131,4 @@
 
         </plugins>
     </build>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 </project>
