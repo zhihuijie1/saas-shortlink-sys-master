@@ -18,8 +18,13 @@
         <java.version>17</java.version>
     </properties>
 
-    <!--数据库持久层框架-->
     <dependencies>
+        <!--好用的java开发工具-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+        <!--数据库持久层框架-->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

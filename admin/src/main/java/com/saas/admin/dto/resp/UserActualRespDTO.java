@@ -2,11 +2,8 @@ package com.saas.admin.dto.resp;
 
 import lombok.Data;
 
-/**
- * 用户返回参数行营
- */
 @Data
-public class UserRespDTO {
+public class UserActualRespDTO {
     /**
      * id
      */
@@ -16,7 +13,6 @@ public class UserRespDTO {
      * 用户名
      */
     private String username;
-
 
     /**
      * 真实姓名
@@ -32,5 +28,4 @@ public class UserRespDTO {
      * 邮箱
      */
     private String mail;
-
 }

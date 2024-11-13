@@ -1,11 +1,10 @@
 package com.saas.admin.dao.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.saas.admin.common.database.BaseDO;
 import lombok.Data;
 
 @Data
-@TableName("t_user")
+@TableName("t_user_0")
 public class UserDo {
     /**
      * id

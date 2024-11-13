@@ -1,4 +1,4 @@
-package com.saas.admin.common.database;
+package com.saas.admin.common.convention.database;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;

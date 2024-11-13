@@ -2,6 +2,7 @@ package com.saas.admin.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.saas.admin.dao.entity.UserDo;
+import com.saas.admin.dto.req.UserRegisterReqDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
 
 public interface UserService extends IService<UserDo> {
@@ -11,4 +12,8 @@ public interface UserService extends IService<UserDo> {
      * @return
      */
     UserRespDTO getUserByUsername(String username);
+
+    boolean hasUsername(String username);
+
+    Void register(UserRegisterReqDTO requestParam);
 }
