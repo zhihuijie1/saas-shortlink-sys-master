@@ -4,8 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import com.saas.admin.common.convention.result.Result;
 import com.saas.admin.common.convention.result.Results;
+import com.saas.admin.dto.req.UserLoginReqDTO;
 import com.saas.admin.dto.req.UserRegisterReqDTO;
+import com.saas.admin.dto.req.UserUpdateReqDTO;
 import com.saas.admin.dto.resp.UserActualRespDTO;
+import com.saas.admin.dto.resp.UserLoginRespDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
 import com.saas.admin.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,5 +54,30 @@ public class UserController {
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
         return Results.success(userService.register(requestParam));
     }
+
+    /**
+     * 修改用户
+     */
+    @GetMapping("/api/short-link/admin/v1/user")
+    public Result<Void> update(@RequestBody UserUpdateReqDTO userUpdateReqDTO) {
+        return Results.success(userService.update(userUpdateReqDTO));
+    }
+
+    /**
+     * 用户登录
+     */
+    @PostMapping("/api/short-link/admin/v1/user/login")
+    public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO userLoginReqDTO) {
+        return Results.success(userService.login(userLoginReqDTO));
+    }
+
+
+    /**
+     * 检查用户是否登录
+     */
+
+    /**
+     * 用户退出登录
+     */
 
 }
