@@ -91,13 +91,20 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
         }
         return new UserLoginRespDTO(UUID.randomUUID().toString());
     }
+    
     /**
      * 检查用户是否登录
      */
-
+    @Override
+    public Boolean checkLogin(String username, String token) {
+        return null;
+    }
 
     /**
      * 用户退出登录
      */
-
+    @Override
+    public Void logout() {
+        return null;
+    }
 }

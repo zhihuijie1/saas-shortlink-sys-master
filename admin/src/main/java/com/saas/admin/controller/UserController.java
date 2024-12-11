@@ -1,7 +1,6 @@
 package com.saas.admin.controller;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.baomidou.mybatisplus.core.toolkit.BeanUtils;
 import com.saas.admin.common.convention.result.Result;
 import com.saas.admin.common.convention.result.Results;
 import com.saas.admin.dto.req.UserLoginReqDTO;
@@ -19,7 +18,7 @@ public class UserController {
 
     @Autowired
     UserService userService;
-    
+
     /**
      * 根据用户名，查询用户信息
      */
@@ -75,9 +74,16 @@ public class UserController {
     /**
      * 检查用户是否登录
      */
+    @GetMapping("/api/short-link/admin/v1/user/check-login")
+    public Result<Boolean> checkLogin(@RequestParam("username") String username,@RequestParam("token") String token) {
+        return Results.success(userService.checkLogin(username, token));
+    }
 
     /**
      * 用户退出登录
      */
-
+    @GetMapping("/api/short-link/admin/v1/user/logout")
+    public Result<Void> logout(@RequestParam("username") String username, @RequestParam("token") String token) {
+        return Results.success(userService.logout());
+    }
 }

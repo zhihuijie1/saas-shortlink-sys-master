@@ -235,5 +235,13 @@ UserRespDTO 没有被标记为 Serializable：虽然在 Spring Boot 中这不是
 
 
 
+## 加强点
+
+
+
+### 1：登录验证功能
+
+判断当前的用户是否登录，可以使用JWT进行校验 - 深入理解 JWT，和 spring security，也可以使用redis进行存储。
+
 
 

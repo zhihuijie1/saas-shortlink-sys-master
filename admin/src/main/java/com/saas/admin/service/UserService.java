@@ -9,11 +9,7 @@ import com.saas.admin.dto.resp.UserLoginRespDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
 
 public interface UserService extends IService<UserDo> {
-    /**
-     * 根据用户名查询用户信息
-     * @param username
-     * @return
-     */
+
     UserRespDTO getUserByUsername(String username);
 
     boolean hasUsername(String username);
@@ -23,4 +19,8 @@ public interface UserService extends IService<UserDo> {
     Void update(UserUpdateReqDTO userUpdateReqDTO);
 
     UserLoginRespDTO login(UserLoginReqDTO userLoginReqDTO);
+
+    Boolean checkLogin(String username, String token);
+
+    Void logout();
 }
