@@ -17,6 +17,10 @@ import com.saas.admin.dto.resp.UserRespDTO;
 import com.saas.admin.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.Claims;
+import java.util.Date;
 
 import java.rmi.ServerException;
 import java.util.Random;
@@ -24,6 +28,29 @@ import java.util.UUID;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements UserService {
+    private static final String SECRET_KEY = "your_secret_key"; // Replace with your actual secret key
+    private static final long EXPIRATION_TIME = 864_000_000; // 10 days
+
+    public String generateToken(String username) {
+        return Jwts.builder()
+                .setSubject(username)
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
+                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
+                .compact();
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Claims claims = Jwts.parser()
+                    .setSigningKey(SECRET_KEY)
+                    .parseClaimsJws(token)
+                    .getBody();
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     /**
      * 根据用户名，查询用户信息
      */
@@ -84,12 +111,12 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
         LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class)
                 .eq(UserDo::getUsername, userLoginReqDTO.getUsername())
                 .eq(UserDo::getPassword, userLoginReqDTO.getPassword());
-        //.eq(UserDO::getDelFlag, 0);
         UserDo userDo = baseMapper.selectOne(queryWrapper);
         if(userDo == null) {
             throw new ClientException(UserErrorCodeEnum.USER_NULL);
         }
-        return new UserLoginRespDTO(UUID.randomUUID().toString());
+        String token = generateToken(userLoginReqDTO.getUsername());
+        return new UserLoginRespDTO(token);
     }
     
     /**
@@ -97,7 +124,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
      */
     @Override
     public Boolean checkLogin(String username, String token) {
-        return null;
+        return validateToken(token);
     }
 
     /**
