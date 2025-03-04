@@ -1,4 +1,4 @@
-1：什么是序列化，序列化的作用是什么，为什么加入序列化id
+## 1：什么是序列化，序列化的作用是什么，为什么加入序列化id
 
 ```java
 private static final long serialVersionUID = 5679018624309023727L;

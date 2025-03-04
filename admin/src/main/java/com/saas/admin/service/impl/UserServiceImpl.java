@@ -15,55 +15,39 @@ import com.saas.admin.dto.req.UserUpdateReqDTO;
 import com.saas.admin.dto.resp.UserLoginRespDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
 import com.saas.admin.service.UserService;
-import org.springframework.beans.BeanUtils;
+import org.redisson.api.RBloomFilter;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.Claims;
-import java.util.Date;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.rmi.ServerException;
-import java.util.Random;
-import java.util.UUID;
+import static com.saas.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
+import static com.saas.admin.common.enums.UserErrorCodeEnum.USER_NAME_EXIST;
+import static com.saas.admin.common.enums.UserErrorCodeEnum.USER_SAVE_ERROR;
 
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements UserService {
-    private static final String SECRET_KEY = "your_secret_key"; // Replace with your actual secret key
-    private static final long EXPIRATION_TIME = 864_000_000; // 10 days
 
-    public String generateToken(String username) {
-        return Jwts.builder()
-                .setSubject(username)
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.HS512, SECRET_KEY)
-                .compact();
-    }
+    @Autowired
+    RBloomFilter<String> userRegisterCachePenetrationBloomFilter; // 引入用户注册布隆过滤器
 
-    public boolean validateToken(String token) {
-        try {
-            Claims claims = Jwts.parser()
-                    .setSigningKey(SECRET_KEY)
-                    .parseClaimsJws(token)
-                    .getBody();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
+    @Autowired
+    RedissonClient redissonClient;
     /**
      * 根据用户名，查询用户信息
      */
     @Override
     public UserRespDTO getUserByUsername(String username) {
-        LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class).eq(UserDo::getUsername, username);
+        LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class)
+                .eq(UserDo::getUsername, username);
         UserDo userDo = baseMapper.selectOne(queryWrapper);
         if(userDo == null) {
             throw new ServiceException(UserErrorCodeEnum.USER_NULL);
         }
         UserRespDTO result = new UserRespDTO();
-        return BeanUtil.toBean(userDo, UserRespDTO.class);
-        //return result;
+        BeanUtil.copyProperties(userDo,result);
+        return result;
     }
 
     /**
@@ -71,36 +55,47 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
      */
     @Override
     public boolean hasUsername(String username) {
-        LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class).eq(UserDo::getUsername, username);
-        return baseMapper.exists(queryWrapper);
+        boolean iscontains = userRegisterCachePenetrationBloomFilter.contains(username);
+        return iscontains;
     }
 
     /**
      * 注册用户
      */
+    @Transactional(rollbackFor = Exception.class)
     @Override
-    public Void register(UserRegisterReqDTO requestParam) {
-        if(this.hasUsername(requestParam.getUsername())) {
-            throw new ClientException(UserErrorCodeEnum.USER_EXIST);
+    public void register(UserRegisterReqDTO requestParam) {
+        if(hasUsername(requestParam.getUsername())) {
+            throw new ClientException(USER_NAME_EXIST);
         }
-        int insert = baseMapper.insert(BeanUtil.toBean(requestParam, UserDo.class));
-        if(insert < 1) {
-            throw new ClientException(UserErrorCodeEnum.USER_SAVE_ERROR);
+        RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + requestParam.getUsername());
+        try {
+            boolean triedLock = lock.tryLock();
+            if(triedLock) {
+                int insert = baseMapper.insert(BeanUtil.toBean(requestParam, UserDo.class));
+                if(insert < 1) {
+                    throw new ClientException(USER_SAVE_ERROR);
+                }
+                userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
+                return;
+            }
+            throw new ClientException(USER_NAME_EXIST);
+        }finally {
+            lock.unlock();
         }
-        return null;
     }
 
     /**
      * 修改用户信息
      */
     @Override
-    public Void update(UserUpdateReqDTO userUpdateReqDTO) {
+    public void update(UserUpdateReqDTO userUpdateReqDTO) {
         LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class).eq(UserDo::getUsername, userUpdateReqDTO.getUsername());
         int update = baseMapper.update(BeanUtil.toBean(userUpdateReqDTO, UserDo.class), queryWrapper);
         if(update < 1) {
             throw new ClientException(UserErrorCodeEnum.USER_UPDATE_ERROR);
         }
-        return null;
+
     }
 
     /**
@@ -115,8 +110,8 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
         if(userDo == null) {
             throw new ClientException(UserErrorCodeEnum.USER_NULL);
         }
-        String token = generateToken(userLoginReqDTO.getUsername());
-        return new UserLoginRespDTO(token);
+        // String token = generateToken(userLoginReqDTO.getUsername());
+        return new UserLoginRespDTO("token");
     }
     
     /**
@@ -124,14 +119,14 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
      */
     @Override
     public Boolean checkLogin(String username, String token) {
-        return validateToken(token);
+        // return validateToken(token);
+        return true;
     }
 
     /**
      * 用户退出登录
      */
     @Override
-    public Void logout() {
-        return null;
+    public void logout() {
     }
 }

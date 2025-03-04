@@ -5,7 +5,6 @@ import com.saas.admin.common.convention.result.Result;
 import com.saas.admin.common.convention.result.Results;
 import com.saas.admin.dto.req.UserLoginReqDTO;
 import com.saas.admin.dto.req.UserRegisterReqDTO;
-import com.saas.admin.dto.req.UserUpdateReqDTO;
 import com.saas.admin.dto.resp.UserActualRespDTO;
 import com.saas.admin.dto.resp.UserLoginRespDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
@@ -20,7 +19,7 @@ public class UserController {
     UserService userService;
 
     /**
-     * 根据用户名，查询用户信息
+     * 根据用户名，查询用户脱敏信息 right
      */
     @GetMapping("/api/short-link/admin/v1/user/{username}")
     public Result<UserRespDTO> getByUsername(@PathVariable("username") String username) {
@@ -29,7 +28,7 @@ public class UserController {
     }
 
     /**
-     * 根据用户名查询无脱敏用户信息
+     * 根据用户名查询无脱敏用户信息 right
      */
     @GetMapping("/api/short-link/admin/v1/actual/user/{username}")
     public Result<UserActualRespDTO> getActualUserByUsername(@PathVariable("username") String username) {
@@ -51,23 +50,25 @@ public class UserController {
      */
     @PostMapping("/api/short-link/admin/v1/user")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
-        return Results.success(userService.register(requestParam));
+        userService.register(requestParam);
+        return Results.success();
     }
 
     /**
      * 修改用户
      */
-    @GetMapping("/api/short-link/admin/v1/user")
+/*    @GetMapping("/api/short-link/admin/v1/user")
     public Result<Void> update(@RequestBody UserUpdateReqDTO userUpdateReqDTO) {
         return Results.success(userService.update(userUpdateReqDTO));
-    }
+    }*/
 
     /**
      * 用户登录
      */
     @PostMapping("/api/short-link/admin/v1/user/login")
     public Result<UserLoginRespDTO> login(@RequestBody UserLoginReqDTO userLoginReqDTO) {
-        return Results.success(userService.login(userLoginReqDTO));
+        UserLoginRespDTO userLoginRespDTO = userService.login(userLoginReqDTO);
+        return Results.success(userLoginRespDTO);
     }
 
 
@@ -82,8 +83,8 @@ public class UserController {
     /**
      * 用户退出登录
      */
-    @GetMapping("/api/short-link/admin/v1/user/logout")
+/*    @GetMapping("/api/short-link/admin/v1/user/logout")
     public Result<Void> logout(@RequestParam("username") String username, @RequestParam("token") String token) {
         return Results.success(userService.logout());
-    }
+    }*/
 }

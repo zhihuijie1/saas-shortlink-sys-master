@@ -245,3 +245,203 @@ UserRespDTO 没有被标记为 Serializable：虽然在 Spring Boot 中这不是
 
 
 
+
+
+
+
+## maven：
+
+### 1：父模块的打包形式  - pom
+
+父模块以pom的形式打包，所以父模块的插件是不会打到jar包里面的，只有具体的子模块打包的时候才会打到jar包里面
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.saas</groupId>
+    <artifactId>shortlink</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <name>shortlink</name>
+    <description>shortlink</description>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>admin</module>
+    </modules>
+
+    <!--版本信息-->
+
+    <properties>
+        <java.version>17</java.version>
+        <spring-boot.version>3.0.7</spring-boot.version>
+        <spring-cloud.version>2022.0.3</spring-cloud.version>
+        <spring-cloud-alibaba.version>2022.0.0.0-RC2</spring-cloud-alibaba.version>
+        <mybatis-spring-boot-starter.version>3.0.2</mybatis-spring-boot-starter.version>
+        <shardingsphere.version>5.3.2</shardingsphere.version>
+        <jjwt.version>0.9.1</jjwt.version>
+        <fastjson2.version>2.0.36</fastjson2.version>
+        <mybatis-plus.version>3.5.3.1</mybatis-plus.version>
+        <dozer-core.version>6.5.2</dozer-core.version>
+        <hutool-all.version>5.8.20</hutool-all.version>
+        <redisson.version>3.21.3</redisson.version>
+        <guava.version>30.0-jre</guava.version>
+    </properties>
+    <!--dependencies 统一依赖管理，子模块不用自己再加了-->
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.30</version>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+
+    <!--依赖管理 后面的子模块还需要自己加-->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.cloud</groupId>
+                <artifactId>spring-cloud-alibaba-dependencies</artifactId>
+                <version>${spring-cloud-alibaba.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${mybatis-plus.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.shardingsphere</groupId>
+                <artifactId>shardingsphere-jdbc-core</artifactId>
+                <version>${shardingsphere.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.github.dozermapper</groupId>
+                <artifactId>dozer-core</artifactId>
+                <version>${dozer-core.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool-all.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.redisson</groupId>
+                <artifactId>redisson-spring-boot-starter</artifactId>
+                <version>${redisson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>${guava.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.6.1</version>
+                <configuration>
+                    <source>17</source>
+                    <target>17</target>
+                </configuration>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>
+
+```
+
+
+
+## 阿里云服务器：
+
+### 如何远程连接阿里云服务器中的mysql
+
+购买阿里云服务器以后进入如下界面
+
+![image-20250205012327947](D:/%E4%BD%A0%E5%A5%BDJava/image-20250205012327947.png)
+
+点击安全组，点击管理规则，来添加我们端口，允许外部访问，这里添加了8888端口，允许宝塔linux来配置我们的服务器
+
+![image-20250205012632733](D:/%E4%BD%A0%E5%A5%BDJava/image-20250205012632733.png)
+
+在宝塔linux面板中我可以提前安装一些组件（mysql / jdk 。。。。）来提前配置一下我的服务器。
+
+在宝塔linux面板中点击mysql，点击root密码，来修改我们的数据库密码，点击添加数据库来创建我们的数据库。
+
+![image-20250205012845096](D:/%E4%BD%A0%E5%A5%BDJava/image-20250205012845096.png)
+
+![image-20250205013128088](D:/%E4%BD%A0%E5%A5%BDJava/image-20250205013128088.png)
+
+点击安全，添加上我们的数据库端口，允许外部访问
+
+![image-20250205013017077](D:/%E4%BD%A0%E5%A5%BDJava/image-20250205013017077.png)
+
+此时在navicat中输入即可连接远程服务器
+
+![image-20250205013741096](D:/%E4%BD%A0%E5%A5%BDJava/image-20250205013741096.png)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

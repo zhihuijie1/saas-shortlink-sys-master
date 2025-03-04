@@ -5,16 +5,17 @@ spring:
   datasource:
     dataSourceClassName: com.zaxxer.hikari.HikariDataSource
     driverClassName: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://127.0.0.1:3306/link?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
-    username: root
-    password: 171612Cgj.
+    url: jdbc:mysql://118.31.71.211:3306/link?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: chenguangjie
+    password: 171612cgjA
     hikari:
       connection-test-query: select 1
       connection-timeout: 20000
       idle-timeout: 300000
       maximum-pool-size: 5
       minimum-idle: 5
-
+  data:
     redis:
-      host: 192.168.200.129
+      host: 118.31.71.211
       port: 6379
+      password: 171612cgj

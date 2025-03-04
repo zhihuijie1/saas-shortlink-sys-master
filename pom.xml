@@ -9,10 +9,6 @@
     <description>shortlink</description>
     <packaging>pom</packaging>
 
-    <modules>
-        <module>admin</module>
-    </modules>
-
     <!--版本信息-->
 
     <properties>
@@ -30,17 +26,21 @@
         <redisson.version>3.21.3</redisson.version>
         <guava.version>30.0-jre</guava.version>
     </properties>
+
+    <modules>
+        <module>admin</module>
+        <module>project</module>
+        <module>gateway</module>
+    </modules>
+
     <!--dependencies 统一依赖管理，子模块不用自己再加了-->
     <dependencies>
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
-            <scope>provided</scope>
         </dependency>
     </dependencies>
 
-    <!--依赖管理 后面的子模块还需要自己加-->
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -128,7 +128,6 @@
                     <target>17</target>
                 </configuration>
             </plugin>
-
         </plugins>
     </build>
 </project>
