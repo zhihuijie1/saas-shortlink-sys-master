@@ -2,6 +2,7 @@ package com.saas.admin.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.saas.admin.common.convention.exception.ClientException;
@@ -34,6 +35,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
 
     @Autowired
     RedissonClient redissonClient;
+
     /**
      * 根据用户名，查询用户信息
      */
@@ -42,11 +44,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
         LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class)
                 .eq(UserDo::getUsername, username);
         UserDo userDo = baseMapper.selectOne(queryWrapper);
-        if(userDo == null) {
+        if (userDo == null) {
             throw new ServiceException(UserErrorCodeEnum.USER_NULL);
         }
         UserRespDTO result = new UserRespDTO();
-        BeanUtil.copyProperties(userDo,result);
+        BeanUtil.copyProperties(userDo, result);
         return result;
     }
 
@@ -65,22 +67,22 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
     @Transactional(rollbackFor = Exception.class)
     @Override
     public void register(UserRegisterReqDTO requestParam) {
-        if(hasUsername(requestParam.getUsername())) {
+        if (hasUsername(requestParam.getUsername())) {
             throw new ClientException(USER_NAME_EXIST);
         }
         RLock lock = redissonClient.getLock(LOCK_USER_REGISTER_KEY + requestParam.getUsername());
         try {
             boolean triedLock = lock.tryLock();
-            if(triedLock) {
+            if (triedLock) {
                 int insert = baseMapper.insert(BeanUtil.toBean(requestParam, UserDo.class));
-                if(insert < 1) {
+                if (insert < 1) {
                     throw new ClientException(USER_SAVE_ERROR);
                 }
                 userRegisterCachePenetrationBloomFilter.add(requestParam.getUsername());
                 return;
             }
             throw new ClientException(USER_NAME_EXIST);
-        }finally {
+        } finally {
             lock.unlock();
         }
     }
@@ -89,13 +91,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
      * 修改用户信息
      */
     @Override
-    public void update(UserUpdateReqDTO userUpdateReqDTO) {
-        LambdaQueryWrapper<UserDo> queryWrapper = Wrappers.lambdaQuery(UserDo.class).eq(UserDo::getUsername, userUpdateReqDTO.getUsername());
-        int update = baseMapper.update(BeanUtil.toBean(userUpdateReqDTO, UserDo.class), queryWrapper);
-        if(update < 1) {
-            throw new ClientException(UserErrorCodeEnum.USER_UPDATE_ERROR);
-        }
-
+    public void update(UserUpdateReqDTO requestParam) {
+        // TODO: 验证修改的用户信息是否属于当前用户 - 使用网关验证
+        LambdaUpdateWrapper<UserDo> updateWrapper = Wrappers.lambdaUpdate(UserDo.class)
+                .eq(UserDo::getUsername, requestParam.getUsername());
+        baseMapper.update(BeanUtil.toBean(requestParam, UserDo.class), updateWrapper);
     }
 
     /**
@@ -107,13 +107,13 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
                 .eq(UserDo::getUsername, userLoginReqDTO.getUsername())
                 .eq(UserDo::getPassword, userLoginReqDTO.getPassword());
         UserDo userDo = baseMapper.selectOne(queryWrapper);
-        if(userDo == null) {
+        if (userDo == null) {
             throw new ClientException(UserErrorCodeEnum.USER_NULL);
         }
         // String token = generateToken(userLoginReqDTO.getUsername());
         return new UserLoginRespDTO("token");
     }
-    
+
     /**
      * 检查用户是否登录
      */

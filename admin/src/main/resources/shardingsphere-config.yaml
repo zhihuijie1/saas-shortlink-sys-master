@@ -1,0 +1,67 @@
+dataSources:
+  ds_0:
+    dataSourceClassName: com.zaxxer.hikari.HikariDataSource
+    driverClassName: com.mysql.cj.jdbc.Driver
+    jdbcUrl: jdbc:mysql://118.31.71.211:3306/link?useUnicode=true&characterEncoding=UTF-8&rewriteBatchedStatements=true&allowMultiQueries=true&serverTimezone=Asia/Shanghai
+    username: chenguangjie
+    password: 171612cgjA
+
+# 分片规则配置
+rules:
+  - !SHARDING
+    tables:
+      # 目标分片表名称
+      t_user:
+        # 真实表节点表达式，创建16个分表（t_user_0到t_user_15）
+        actualDataNodes: ds_0.t_user_${0..15}
+        # 分表策略
+        tableStrategy:
+          # 标准分片策略
+          standard:
+            # 分片键字段名
+            shardingColumn: username
+            # 分片算法名称
+            shardingAlgorithmName: user_table_hash_mod
+    # 分片算法定义
+    shardingAlgorithms:
+      # 算法名称（与上文对应）
+      user_table_hash_mod:
+        # 哈希取模算法类型
+        type: HASH_MOD
+        # 分片总数，对应actualDataNodes的16个分表
+        props:
+          sharding-count: 16
+  # 数据加密存储规则
+  - !ENCRYPT
+    # 需要加密的表集合
+    tables:
+      # 用户表
+      t_user:
+        # 用户表中哪些字段需要进行加密
+        columns:
+          # 手机号字段，逻辑字段，不一定是在数据库中真实存在
+          phone:
+            # 手机号字段存储的密文字段，这个是数据库中真实存在的字段
+            cipherColumn: phone
+            # 身份证字段加密算法
+            encryptorName: common_encryptor
+          mail:
+            cipherColumn: mail
+            encryptorName: common_encryptor
+          password:
+            cipherColumn: password
+            encryptorName: common_encryptor
+        # 是否按照密文字段查询
+        queryWithCipherColumn: true
+    # 加密算法
+    encryptors:
+      # 自定义加密算法名称
+      common_encryptor:
+        # 加密算法类型
+        type: AES
+        props:
+          # AES 加密密钥
+          aes-key-value: d6oadClrrb9A3GWo
+# 全局属性配置 - 展现逻辑 SQL & 真实 SQL
+props:
+  sql-show: true

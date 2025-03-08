@@ -5,6 +5,7 @@ import com.saas.admin.common.convention.result.Result;
 import com.saas.admin.common.convention.result.Results;
 import com.saas.admin.dto.req.UserLoginReqDTO;
 import com.saas.admin.dto.req.UserRegisterReqDTO;
+import com.saas.admin.dto.req.UserUpdateReqDTO;
 import com.saas.admin.dto.resp.UserActualRespDTO;
 import com.saas.admin.dto.resp.UserLoginRespDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
@@ -37,7 +38,7 @@ public class UserController {
     }
 
     /**
-     * 查询用户名是否存在
+     * 查询用户名是否存在 right
      */
     @GetMapping("/api/short-link/admin/v1/user/has-username")
     public Result<Boolean> hasUsername(@RequestParam("username") String username) {
@@ -46,7 +47,7 @@ public class UserController {
     }
 
     /**
-     * 注册用户
+     * 注册用户 right
      */
     @PostMapping("/api/short-link/admin/v1/user")
     public Result<Void> register(@RequestBody UserRegisterReqDTO requestParam) {
@@ -57,10 +58,11 @@ public class UserController {
     /**
      * 修改用户
      */
-/*    @GetMapping("/api/short-link/admin/v1/user")
-    public Result<Void> update(@RequestBody UserUpdateReqDTO userUpdateReqDTO) {
-        return Results.success(userService.update(userUpdateReqDTO));
-    }*/
+    @PutMapping("/api/short-link/admin/v1/user")
+    public Result<Void> update(@RequestBody UserUpdateReqDTO requestParam) {
+        userService.update(requestParam);
+        return Results.success();
+    }
 
     /**
      * 用户登录
