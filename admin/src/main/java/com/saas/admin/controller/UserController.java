@@ -75,7 +75,7 @@ public class UserController {
 
 
     /**
-     * 检查用户是否登录
+     * 检查用户是否登录-
      */
     @GetMapping("/api/short-link/admin/v1/user/check-login")
     public Result<Boolean> checkLogin(@RequestParam("username") String username,@RequestParam("token") String token) {
