@@ -85,8 +85,9 @@ public class UserController {
     /**
      * 用户退出登录
      */
-/*    @GetMapping("/api/short-link/admin/v1/user/logout")
+    @GetMapping("/api/short-link/admin/v1/user/logout")
     public Result<Void> logout(@RequestParam("username") String username, @RequestParam("token") String token) {
-        return Results.success(userService.logout());
-    }*/
+        userService.logout(username, token);
+        return Results.success();
+    }
 }
