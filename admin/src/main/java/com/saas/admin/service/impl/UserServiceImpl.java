@@ -17,6 +17,7 @@ import com.saas.admin.dto.req.UserUpdateReqDTO;
 import com.saas.admin.dto.resp.UserLoginRespDTO;
 import com.saas.admin.dto.resp.UserRespDTO;
 import com.saas.admin.service.UserService;
+import lombok.extern.slf4j.Slf4j;
 import org.redisson.api.RBloomFilter;
 import org.redisson.api.RLock;
 import org.redisson.api.RedissonClient;
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit;
 import static com.saas.admin.common.constant.RedisCacheConstant.LOCK_USER_REGISTER_KEY;
 import static com.saas.admin.common.enums.UserErrorCodeEnum.USER_NAME_EXIST;
 import static com.saas.admin.common.enums.UserErrorCodeEnum.USER_SAVE_ERROR;
-
+@Slf4j
 @Service
 public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements UserService {
 
