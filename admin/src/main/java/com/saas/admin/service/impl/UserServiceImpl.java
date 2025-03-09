@@ -134,7 +134,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, UserDo> implements 
         // redis存储用户登录时的信息： 用户登录redis键 + token + 个人信息
         stringRedisTemplate.opsForHash().put("login_" + requestParam.getUsername(), uuid, JSON.toJSONString(userDo));
         // 设置redis键的存活时间 - 用户登录时间
-        stringRedisTemplate.expire("login_" + requestParam.getUsername(),30L, TimeUnit.MINUTES);
+        stringRedisTemplate.expire("login_" + requestParam.getUsername(),30L, TimeUnit.DAYS);
         return new UserLoginRespDTO(uuid);
     }
 
